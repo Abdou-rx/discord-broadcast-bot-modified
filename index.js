@@ -16,7 +16,39 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => console.log(`Your app is listening on port ${PORT}`));
-app.get('/', (req, res) => res.send('<body><center><h1>Bot 24H Online!</h1></center></body>'));
+app.get('/', (req, res) => {
+    const botName = client.user ? client.user.username : "Bot";
+    const status = client.user ? "Online ✅" : "Offline ❌";
+    const uptime = process.uptime();
+    const version = "v1.0.0";
+    const serverCount = client.guilds.cache.size;
+    const userCount = client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0);
+
+    function formatUptime(seconds) {
+        const d = Math.floor(seconds / (3600 * 24));
+        const h = Math.floor((seconds % (3600 * 24)) / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = Math.floor(seconds % 60);
+        return `${d}d ${h}h ${m}m ${s}s`;
+    }
+
+    res.send(`
+        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #181818; color: #f1f1f1;">
+            <center style="padding: 50px;">
+                <div style="background-color: #282828; padding: 20px; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.4);">
+                    <h1 style="font-size: 3em; margin: 0;">🤖 ${botName}</h1>
+                    <p style="font-size: 1.2em; margin: 5px;">Status: <span style="color: lime;">${status}</span></p>
+                    <p style="font-size: 1.2em; margin: 5px;">Uptime: ${formatUptime(uptime)}</p>
+                    <p style="font-size: 1.2em; margin: 5px;">Version: ${version}</p>
+                    <p style="font-size: 1.2em; margin: 5px;">Servers: ${serverCount}</p>
+                    <p style="font-size: 1.2em; margin: 5px;">Users: ${userCount}</p>
+                    <p style="font-size: 0.9em; color: #888;">Last Updated: ${new Date().toLocaleString()}</p>
+                </div>
+            </center>
+        </body>
+    `);
+});
+
 
 let broadcastStatus = {
     active: false,
